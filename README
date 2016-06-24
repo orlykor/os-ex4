@@ -1,0 +1,68 @@
+orlykor12, idan0610
+Idan Refaeli (305681132), Orly Koren (203595541)
+EX: 4
+
+FILES:
+README -- This file
+Makefile -- Makefile of the project
+CachingFileSystem.cpp -- implementation of the caching file system.
+Cache.cpp -- the implementation of the cache.
+Cache.h -- the header file of the cache.
+
+REMARKS:
+explanation on how and why our library functions are built the way they are:
+
+we chose to split the implementation of the cache to a separated file,
+where there we wrote all the functions related to the cache.
+init_cache- this function is responsible for initializing the cache, calculating
+the fNew and fOld points and such.
+findBlock - is responsible for finding if a given block exists or not in order
+to check if there is a need of creating a new block and insert it to the cache
+or just move it to the top of the block. if already exits, we check in another
+function if it is in the new section or not and add +1 to the reference count
+accordingly.
+addNewBlock- is responsible for adding a new block to the cache. in case of no
+place it calls the removeBlock function and this one removes a block according
+to the FBR algorithm.
+
+ANSWERS:
+Q1:
+No, it does not always provide faster response then accessing the disk, since it
+depends on the size of the cache. if the cache is too big it cannot be stored
+entirely in the RAM, so the cache may be stored also in the disk  and therefore
+the accessing time is the same as reading directly from the disk.
+
+Q2:
+The reason we can manage the buffer cache with sophisticated algorithms
+that it will be much harder to manage with them the swapping pages is because
+the OS is not supposed to track memory access such as keeping track of the
+reference count for each block, because it is made by hardware components.
+Such operations may take more time or memory, and may involve additional
+components of the hardware, which is much more difficult for the OS.
+
+
+Q3:
+example that LFU is better then LRU:
+if there is a file that is called many times, but not in sequence so the LRU
+algorithm possibly will remove the file from the cache, and then every call to
+the file will need to access the disk. meanwhile the LFU algorithm remembers
+that the file is used often, and therefore will not remove it from the cache.
+example that LRU is better then LFU:
+when a file is called many times in a very short period, and then is not called
+for a very long time. in the LFU the reference count is very high, so the file
+will remain in the cache even it is not longer used. meanwhile in the LRU
+algorithm after the file is not used for a long time it will be removed from
+the cache.
+example that both of them don't help:
+in the case that there are many files that are need be read once and there is a
+small chance that they will be read again, both the LRU and LFU will load the
+cache with those files, and that will cause a lot of swapping in the cache.
+
+
+Q4:
+if there is a file that is called many times in a short time and then not called
+anymore, so it will stay in the new section all the time its being called
+repeatedly. if we will increase the reference count every time the file is
+called when it is in the new section, so it's reference count will be high
+and the file will not be removed from the cache, even though it should have
+been.
